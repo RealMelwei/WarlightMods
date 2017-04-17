@@ -3,12 +3,16 @@ function Server_AdvanceTurn_End(game,addOrder)
     standing=game.ServerGame.LatestTurnStanding;
 	for _,terr in pairs(standing.Territories) do
 		if not (terr.IsNeutral) then
-			if (terr.NumArmies.NumArmies==0) then
-				addOrder(WL.GameOrderEvent.Create(terr.OwnerPlayerID,'Pestilence',nil,WL.TerritoryModification.Create(terr.ID).SetArmiesTo(math.min(terr.NumArmies.NumArmies-Mod.Settings.PestilenceStrength,0))));
-				if (terr.NumArmies.NumArmies<=Mod.Settings.PestilenceStrength) then
-					addOrder(WL.GameOrderEvent.Create(terr.OwnerPlayerID,'Pestilence',nil,WL.TerritoryModification.Create(terr.ID).SetOwnerOpt(WL.PlayerID.Neutral)));
-				end
+			Count = terr.NumArmies.NumArmies;
+			terrMod2=WL.TerritoryModification.Create(terr.ID);
+			terrMod2.SetArmiesTo=math.max(Count-Mod.Settings.PestilenceStrength,0);
+			addOrder(WL.GameOrderEvent.Create(terr.OwnerPlayerID,'Pestilence',{},{terrMod2}));
+			if (Count<=Mod.Settings.PestilenceStrength) then
+				terrMod = WL.TerritoryModification.Create(terr.ID);
+				terrMod.SetOwnerOpt=WL.PlayerID.Neutral;
+				addOrder(WL.GameOrderEvent.Create(terr.OwnerPlayerID,"Pestilence",{},{terrMod}));
 			end
+			
 		end
 	end
 
